@@ -2,6 +2,10 @@
 title: "Introduction to RcensusPkg"
 format: 
   html:
+    grid: 
+      sidebar-width: 250px
+      body-width: 1150px
+      margin-width: 350px
     fontsize: 1.4rem
     page-layout: full
     theme: darkly
@@ -25,7 +29,7 @@ number-sections: true
 
 ## Introduction
 
-Accessing the US Census Bureau's database of survey data and map geometries via their API can be a challenge. The R package [RcensusPkg](https://github.com/deandevl/RcensusPkg) can help by providing specific functions for checking on the availability of geographies, variables, datasets, and dates. In addition, the package provides easy access to the Bureau's extensive Tiger Line map geometries and for joining the maps with Census Bureau survey data.  Presented here is a basic step-by-step demonstration of how [RcensusPkg](https://github.com/deandevl/RcensusPkg) could be applied. The example compares the percentage of computer presence across the states in 2013 with 2023. A series of highlighted 'tasks' are presented with steps to download the data, download the state geometries, join data with the state boundary geometries and finally create a choropleth states map visualization.  The companion packages [RspatialPkg](https://github.com/deandevl/RspatialPkg) and [RplotterPkg](https://github.com/deandevl/RplotterPkg) are ggplot2 based R packages that create and map the visualization. As the researcher gains more knowledge of his/her subject, not all of the steps outlined here will be required.  
+Accessing the US Census Bureau's database of survey data and map geometries via their API can be a challenge. The R package [RcensusPkg](https://github.com/deandevl/RcensusPkg) can help by providing specific functions for checking on the availability of geographies, variables, datasets, and dates. In addition, the package provides easy access to the Bureau's extensive Tiger Line map geometries and for joining the maps with Census Bureau survey data. Presented here is a basic step-by-step demonstration of how [RcensusPkg](https://github.com/deandevl/RcensusPkg) could be applied. The example compares the percentage of computer presence across the states in 2013 with 2023. A series of highlighted 'tasks' are presented with steps to download the data, download the state geometries, join data with the state boundary geometries and finally create a choropleth states map visualization. The companion packages [RspatialPkg](https://github.com/deandevl/RspatialPkg) and [RplotterPkg](https://github.com/deandevl/RplotterPkg) are ggplot2 based R packages that create and map the visualization. As the researcher gains more knowledge of his/her subject, not all of the steps outlined here will be required.
 
 [RcensusPkg](https://github.com/deandevl/RcensusPkg) is available for installation from [deandevl](https://github.com/deandevl/RcensusPkg) github website. There are many additional demonstrations on the package at the [RcensusPkg's](https://github.com/deandevl/RcensusPkg) **demo** folder. Each function is demonstrated for downloading data and simple feature (sf) geometries. For additional applications see [Techniques in Acquisition, Computation, and Display of US Census Bureau Data](https://cb-anal.netlify.app/) which uses [RcensusPkg](https://github.com/deandevl/RcensusPkg) to follow the first nine chapters of Kyle Walker's book [Analyzing US Census Data: Methods, Maps, and Models in R](https://walker-data.com/census-r/index.html).
 
@@ -82,11 +86,11 @@ We are starting from ground zero where we know little about the availability of 
 Do a general search at the US Census Bureau's site to identify possible dataset sources.
 :::
 
-An excellent place to start are the brief descriptions of all the Census Bureau API [datasets](https://www.census.gov/data/developers/data-sets.html). In addition, there is the Census Bureau's [Explorer](https://data.census.gov/all) with a column of filters on the far left and a list of *Tables*. The datasets such as the "American Community Survey" contain several *Tables* and *Tables* contain several data variables. Our goal is to find the dataset acronym that has computer related variables. 
+An excellent place to start are the brief descriptions of all the Census Bureau API [datasets](https://www.census.gov/data/developers/data-sets.html). In addition, there is the Census Bureau's [Explorer](https://data.census.gov/all) with a column of filters on the far left and a list of *Tables*. The datasets such as the "American Community Survey" contain several *Tables* and *Tables* contain several data variables. Our goal is to find the dataset acronym that has computer related variables.
 
 Using [Explorer](https://data.census.gov/all) we see a "American Community Survey" dataset with a table named "DP02 Selected Social Characteristics in the United States". When we click the link for the DP02 Table we get a listing of variables. As we scroll down the listing, you will find at the very end a sub-category "COMPUTERS AND INTERNET USE". Two variables under the category have numbers for households "With a computer" and "With a broadband internet subscription". We also see back toward the top of the page the name of the dataset as "American Community Survey" and the title "2023 ACS 1-Year Estimates Data Profiles". It appears that this dataset and its title are what we are looking for.
 
-Also at the top of the page is a note "American Community Survey 1-Year estimates are published for geographies with a population of 65,000 or more."  Since we will be using US state geographies, our percentage estimates should be accurate.
+Also at the top of the page is a note "American Community Survey 1-Year estimates are published for geographies with a population of 65,000 or more." Since we will be using US state geographies, our percentage estimates should be accurate.
 
 So we have a title, "2023 ACS 1-Year Estimates Data Profiles" under the "American Community Survey" dataset and a table (i.e. DP02) with our computer related variables. Our next task then:
 
@@ -94,7 +98,7 @@ So we have a title, "2023 ACS 1-Year Estimates Data Profiles" under the "America
 Determine the acronym that the Census Bureau API uses for the dataset "ACS 1-Year Estimates Data Profiles".
 :::
 
-To find the acronym we can use `RcensusPkg::get_dataset_names()` which returns a dataframe of dataset names.  It has a parameter *filter_title_str* that filters the names by their title. So return all dataset names containing the  "1-Year" string for all years/vintages:
+To find the acronym we can use `RcensusPkg::get_dataset_names()` which returns a dataframe of dataset names. It has a parameter *filter_title_str* that filters the names by their title. So return all dataset names containing the "1-Year" string for all years/vintages:
 
 ```{r}
 acs_dataset_names_lst <- RcensusPkg::get_dataset_names(
@@ -164,7 +168,7 @@ We obtain similar results but the variable acronym has changed! For 2013 we have
 
 ### Check that the geography is available in the dataset
 
-Datasets can break down the estimates in any number of geography boundaries such as state, county, tract, block, zip code area.  We need to make sure that our target of state boundaries is available for the "acs/acs1/profile" dataset.
+Datasets can break down the estimates in any number of geography boundaries such as state, county, tract, block, zip code area. We need to make sure that our target of state boundaries is available for the "acs/acs1/profile" dataset.
 
 ::: task
 Check the availability of state geography from the "acs/acs1/profile" dataset.
@@ -251,7 +255,7 @@ kableExtra::kbl(acs1_computers_data_2023_dt[1:6,])
 
 ## Join the state percentages with the state boundary geometries
 
-We can use `RcensusPkg::plot_us_data()` to create a choropleth map that joins both the percentage data with state boundary geometries.  The function requires a local directory for the download of the US state boundary shapefiles from the Census Bureau.
+We can use `RcensusPkg::plot_us_data()` to create a choropleth map that joins both the percentage data with state boundary geometries. The function requires a local directory for the download of the US state boundary shapefiles from the Census Bureau.
 
 Define an output directory for the state shapefiles:
 
@@ -271,8 +275,7 @@ computers_2013_lst <- RcensusPkg::plot_us_data(
   scale_breaks = seq(70,100,5),
   scale_labels = seq(70,100,5),
   scale_limits = c(70,100),
-  display_plot = FALSE,
-  show_legend = FALSE
+  display_plot = FALSE
 )
 ```
 
@@ -288,8 +291,7 @@ computers_2023_lst <- RcensusPkg::plot_us_data(
   scale_breaks = seq(70,100,5),
   scale_labels = seq(70,100,5),
   scale_limits = c(70,100),
-  display_plot = FALSE,
-  show_legend = FALSE
+  display_plot = FALSE
 )
 ```
 
@@ -316,7 +318,7 @@ layout <- list(
 RplotterPkg::multi_panel_grid(
   layout = layout,
   cell_width = 20,
-  cell_height = 12,
+  cell_height = 14,
   title = "Computers Present 2013 - 2023",
   plot_titles = c("Year: 2013","Year:2023")
 )
@@ -325,4 +327,3 @@ RplotterPkg::multi_panel_grid(
 ## Conclusion
 
 We have attempted to outline an approach when accessing the Census Bureau's API. Knowing some of the "gotsha's" and utilizing a few of the functions in [RcensusPkg](https://github.com/deandevl/RcensusPkg) could possibly help in a successful study.
-
